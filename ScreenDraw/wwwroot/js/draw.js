@@ -22,7 +22,7 @@ function selectElement(id, valueToSelect) {
 }
 
 connection.start().then(function () {
-    //document.getElementById("sendButton").disabled = false;
+    
 
 }).catch(function (err) {
     return console.error(err.toString());
@@ -122,11 +122,10 @@ document.getElementById("canvas").addEventListener("touchmove", function (event)
 });
 
 const canvas = document.querySelector('#canvas');
+const ctx = canvas.getContext('2d');
 
 function clearCanvas() {
-    const context = canvas.getContext('2d');
-
-    context.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 }
 
 function draw(X, Y, colour) {
@@ -138,7 +137,7 @@ function draw(X, Y, colour) {
     if (!canvas.getContext) {
         return;
     }
-    const ctx = canvas.getContext('2d');
+    //const ctx = canvas.getContext('2d');
 
     if (previousX == 0) {
         previousX = X - rect.x;
