@@ -1,0 +1,33 @@
+﻿@page
+@inject IList<IColourListItem> ColourValues 
+
+
+    <div style="position: absolute; left: 5px; top: 5px; font-size:large;">
+        <label>Select Colour</label>
+        <select id="colours">
+            @{
+                foreach (IColourListItem item in ColourValues)
+                {
+                    @:<option value="@item.Value ">
+                        @item.Text
+                    @:</option>
+                }
+            }
+            
+
+        </select>
+
+        <input type="button" onclick="clearCanvas();" value="Clear Canvas" />
+
+    </div>
+  
+    <canvas id="canvas" style="border: solid 1px blue; position: absolute; top: 40px; left: 5px" width="350" height="550">
+    </canvas>
+    <div>
+
+    </div>
+
+
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/draw.js"></script>
+
