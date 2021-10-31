@@ -7,6 +7,6 @@ namespace ScreenDraw.Interfaces
     {
         string Name { get; set; }
         List<IArtist> Artists { get; }
-        object CurrentImage { get; set; }
+        string CurrentImage { get; set; }
     }
 }

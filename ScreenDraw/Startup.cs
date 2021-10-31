@@ -48,7 +48,9 @@ namespace ScreenDraw
             //the rooms and the artists inside those rooms, and will persist for as long as there are users,
             //or until it expires, (where no one has used the site for a while).
             //TODO Replace the SketchRooms singeton with a permanent form of storage, database, flat files etc.
-            services.Add(new ServiceDescriptor(typeof(ISketchRooms), new SketchRooms()));
+            ISketchRooms sketchrooms = new SketchRooms();
+            sketchrooms.Rooms = new List<IRoom>();
+            services.Add(new ServiceDescriptor(typeof(ISketchRooms), sketchrooms));
 
         }
 

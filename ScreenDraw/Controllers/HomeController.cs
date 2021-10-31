@@ -16,9 +16,6 @@ namespace ScreenDraw.Controllers
             return View();
         }
 
-
-
-
         [HttpPost]
         public JsonResult ImageData([FromBody] object Data)
         {

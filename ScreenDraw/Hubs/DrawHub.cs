@@ -96,8 +96,8 @@ namespace ScreenDraw.Hubs
         }
         
 
-        public Task SendXAndYData(string RoomName, string X, string Y)
-            => Clients.Group(RoomName).SendAsync("ReceiveXYData", X, Y);
+        public Task SendXAndYData(string RoomName, string X, string Y, string Colour)
+            => Clients.Group(RoomName).SendAsync("ReceiveXYData", X, Y, Colour);
         
 
         public Task ChangeColour(string RoomName, string Colour)
@@ -107,7 +107,7 @@ namespace ScreenDraw.Hubs
         public Task ResetDataCommand(string RoomName)
             => Clients.Group(RoomName).SendAsync("ReceiveResetDataCommand");
 
-        public void SetCurrentImage(object Image, string RoomName)
+        public void SetCurrentImage(string Image, string RoomName)
         {
             _sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName))
                 .FirstOrDefault().CurrentImage = Image;

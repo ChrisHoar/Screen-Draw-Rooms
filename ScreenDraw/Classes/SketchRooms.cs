@@ -5,7 +5,7 @@ namespace ScreenDraw.Classes
 {
     public class SketchRooms : ISketchRooms
     {
-        public List<IRoom> Rooms { get; set; } = new List<IRoom>();
+        public List<IRoom> Rooms { get; set; }
         
     }
 }

@@ -2,14 +2,14 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/drawHub").build();
 
-connection.on("ReceiveXYData", function (X, Y) {
-    var colour = document.getElementById("colours").options[document.getElementById("colours").selectedIndex].value;
-
+connection.on("ReceiveXYData", function (X, Y, colour) {
+    
     draw(X, Y, colour);
 });
 
 connection.on("ReceiveColourData", function (colour) {
-    selectElement("colours", colour);
+    //selectElement("colours", colour);
+
 });
 
 connection.on("ReceiveResetDataCommand", function () {
@@ -17,6 +17,7 @@ connection.on("ReceiveResetDataCommand", function () {
 });
 
 connection.on("ReceiveAddedToRoom", function (success) {
+    //For future use
 
 });
 
@@ -48,25 +49,13 @@ var previousY = 0;
 
 
 document.getElementById("canvas").addEventListener("mousedown", function (event) {
-    Reset();
-    engage = true;       
-    event.preventDefault();
+
+    startDrawing(event);
 });
 
 document.getElementById("canvas").addEventListener("mouseup", function (event) {
 
-    Reset();
-    //Push out a reset data command to all clients so the next time
-    //a draw happens the previous X and Y are set to 0 in their
-    //instance as well as this one
-
-    var rn = document.getElementById("roomName").value;
-    connection.invoke("ResetDataCommand", rn).catch(function (err) {
-            return console.error(err.toString());
-    });
-
-    passCanvasBack();
-    event.preventDefault();
+    stopDrawing(event);
 });
 
 document.getElementById("canvas").addEventListener("mouseleave", function (event) {
@@ -84,26 +73,32 @@ function Reset()
 
 document.getElementById("canvas").addEventListener("mousemove", function (event) {
 
-    if (engage == true) {
-        var rn = document.getElementById("roomName").value;
-        connection.invoke("SendXAndYData", rn, event.clientX.toString(), event.clientY.toString())
-            .catch(function (err) {
-                return console.error(err.toString());
-            });
-
-        event.preventDefault();
-    }
+    move(event, event.clientX.toString(), event.clientY.toString());
 });
 
 document.getElementById("canvas").addEventListener("touchstart", function (event) {
 
-    Reset();
-    engage = true;
-    event.preventDefault();
+    startDrawing(event);
 });
 
 document.getElementById("canvas").addEventListener("touchend", function (event) {
 
+    stopDrawing(event);
+});
+
+
+document.getElementById("canvas").addEventListener("touchmove", function (event) {
+
+    move(event, event.changedTouches[0].clientX.toString(), event.changedTouches[0].clientY.toString());
+});
+
+function startDrawing(event) {
+    Reset();
+    engage = true;
+    event.preventDefault();
+}
+
+function stopDrawing(event) {
     Reset();
     //Push out a reset data command to all clients so the next time
     //a draw happens the previous X and Y are set to 0 in their
@@ -116,21 +111,23 @@ document.getElementById("canvas").addEventListener("touchend", function (event) 
 
     passCanvasBack();
     event.preventDefault();
-});
+}
 
+function move(event, X, Y) {
+    //Send draw data coordinates back to the hub, this is then broadcast to all
+    //artists in the room (including this one) and is drawn to the canvas
 
-
-document.getElementById("canvas").addEventListener("touchmove", function (event) {
     if (engage == true) {
-        var rn = document.getElementById("roomName").value;
-        connection.invoke("SendXAndYData", rn, event.changedTouches[0].clientX.toString(), event.changedTouches[0].clientY.toString())
+        var colour = document.getElementById("colours").options[document.getElementById("colours").selectedIndex].value;
+        var roomName = document.getElementById("roomName").value;
+        connection.invoke("SendXAndYData", roomName, X, Y, colour)
             .catch(function (err) {
                 return console.error(err.toString());
             });
 
         event.preventDefault();
     }
-});
+}
 
 const canvas = document.querySelector('#canvas');
 

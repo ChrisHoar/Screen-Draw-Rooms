@@ -4,8 +4,10 @@
 @using ScreenDraw.Interfaces;
 @using ScreenDraw.Classes;
 @using System.Text;
+@using Microsoft.Extensions.Logging;
 @inject ISketchRooms sketchRooms;
 @inject NavigationManager NavigationManager
+@inject ILogger<RoomList> logger
 
 @{
     var sketchRoomsCount = sketchRooms.Rooms is null ? 0 : sketchRooms.Rooms.Count;
@@ -14,7 +16,7 @@
 
 <h1>Screen Draw</h1>
 
-    <p>Welcome to Screen draw, a place where you can sketch in collaboration with others.</p>
+<p>Welcome to Screen draw, a place where you can sketch in collaboration with others.</p>
 
 
 @{
@@ -46,143 +48,157 @@
             <div class="p-2 col-md-8">Room Name</div>
             <div class="p-2 col-md-8"><input id="roomName" @bind="@newRoomName" /></div>
         </div>
-        
+
     </div>
     <div class="row">
         <div class="p-2 col-md-8"><button class="btn btn-primary" @onclick="() => BeginCreateRoom()" @onclick:preventDefault>Create Room</button></div>
     </div>
 </div>
 
-        @if (sketchRoomsCount > 0)
+@if (sketchRoomsCount > 0)
+{
+    <label>Existing sketch rooms:</label>
+    <br />
+    <div class="table-responsive-md">
+        <table class="table">
+            <thead>
+                <tr>
+
+                    <th>
+                        Room Name
+                    </th>
+                    <th colspan="2">
+                        Artists
+                    </th>
+
+                </tr>
+            </thead>
+            @foreach (IRoom room in sketchRooms.Rooms)
+            {
+
+                <tbody>
+                    <tr>
+                        <td>
+                            @room.Name
+                        </td>
+                        <td>
+                            @room.Artists.Count
+                        </td>
+                        <td>
+                            @*<a href="#" @onclick="() => BeginRedirectToRoom(room.Name)">Join Room</a>*@
+                            <button class="btn btn-primary" @onclick="() => BeginRedirectToRoom(room.Name)" @onclick:preventDefault>Join Room</button>
+                        </td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
+}
+
+
+@code {
+    private int currentCount = 0;
+    private string newRoomName = string.Empty;
+    private string artistName = string.Empty;
+    private string error = string.Empty;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private void BeginCreateRoom()
+    {
+        try
         {
-            <label>Existing sketch rooms:</label>
-            <br />
-            <div class="table-responsive-md">
-                <table class="table">
-                    <thead>
-                        <tr>
+            if (ValidateCreateFormData() == true)
+            {
+                CreateRoom();
+            }
+        }
+        catch(Exception ex)
+        {
+            logger.LogError(ex.Message);
+        }
+    }
 
-                            <th>
-                                Room Name
-                            </th>
-                            <th colspan="2">
-                                Artists
-                            </th>
-
-                        </tr>
-                    </thead>
-                    @foreach (IRoom room in sketchRooms.Rooms)
-                    {
-
-                        <tbody>
-                            <tr>
-                                <td>
-                                    @room.Name
-                                </td>
-                                <td>
-                                    @room.Artists.Count
-                                </td>
-                                <td>
-                                    @*<a href="#" @onclick="() => BeginRedirectToRoom(room.Name)">Join Room</a>*@
-                                    <button class="btn btn-primary" @onclick="() => BeginRedirectToRoom(room.Name)" @onclick:preventDefault>Join Room</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    }
-                </table>
-            </div>
+    private bool ValidateCreateFormData()
+    {
+        bool ok = false;
+        //Ensure a unique room name and also an artist name have been entered
+        if (string.IsNullOrEmpty(newRoomName.Trim()) == true)
+        {
+            error = "Please enter a name for the room you'd like to create";
+        }
+        else if (string.IsNullOrEmpty(artistName.Trim()) == true)
+        {
+            error = "Please enter the artist name you'd like to be known as";
+        }
+        else if (sketchRooms.Rooms.Where(r => r.Name == newRoomName).Count() > 0)
+        {
+            error = "A room aleady exists with that name. Please try a different one.";
+        }
+        else
+        {
+            ok = true;
         }
 
+        return ok;
+    }
 
-        @code {
-            private int currentCount = 0;
-            private string newRoomName = string.Empty;
-            private string artistName = string.Empty;
-            private string error = string.Empty;
+    private void CreateRoom()
+    {
+        sketchRooms.Rooms.Add(new Room { Name = newRoomName, Artists = new List<IArtist>() });
+        StringBuilder url = new StringBuilder()
+            .Append("SketchRoom?RoomName=")
+            .Append(newRoomName)
+            .Append("&ArtistName=")
+            .Append(artistName);
 
-            private void IncrementCount()
+        NavigationManager.NavigateTo(url.ToString(), true); ;
+    }
+
+    private void BeginRedirectToRoom(string roomName)
+    {
+        try
+        {
+            if (ValidateRedirectFormData(roomName) == true)
             {
-                currentCount++;
+                RedirectToRoom(roomName);
             }
-
-            private void BeginCreateRoom()
-            {
-                if (ValidateCreateFormData() == true)
-                {
-                    CreateRoom();
-                }
-            }
-
-            private bool ValidateCreateFormData()
-            {
-                bool ok = false;
-                //Ensure a unique room name and also an artist name have been entered
-                if (string.IsNullOrEmpty(newRoomName.Trim()) == true)
-                {
-                    error = "Please enter a name for the room you'd like to create";
-                }
-                else if (string.IsNullOrEmpty(artistName.Trim()) == true)
-                {
-                    error = "Please enter the artist name you'd like to be known as";
-                }
-                else if (sketchRooms.Rooms.Where(r => r.Name == newRoomName).Count() > 0)
-                {
-                    error = "A room aleady exists with that name. Please try a different one.";
-                }
-                else
-                {
-                    ok = true;
-                }
-
-                return ok;
-            }
-
-            private void CreateRoom()
-            {
-                sketchRooms.Rooms.Add(new Room { Name = newRoomName, Artists = new List<IArtist>() });
-                StringBuilder url = new StringBuilder()
-                    .Append("SketchRoom?RoomName=")
-                    .Append(newRoomName)
-                    .Append("&ArtistName=")
-                    .Append(artistName);
-
-                NavigationManager.NavigateTo(url.ToString(), true); ;
-            }
-
-            private void BeginRedirectToRoom(string roomName)
-            {
-                if (ValidateRedirectFormData(roomName) == true)
-                {
-                    RedirectToRoom(roomName);
-                }
-            }
-
-            private bool ValidateRedirectFormData(string roomName)
-            {
-                bool ok = false;
-                //Ensure and artist name has been entered
-                if (string.IsNullOrEmpty(artistName.Trim()) == true)
-                {
-                    error = "Please enter an artist name you'd like to be known as";
-                }
-                else
-                {
-                    ok = true;
-                }
-
-                return ok;
-            }
-
-            private void RedirectToRoom(string roomName)
-            {
-                StringBuilder url = new StringBuilder()
-                    .Append("SketchRoom?RoomName=")
-                    .Append(roomName)
-                    .Append("&ArtistName=")
-                    .Append(artistName);
-
-                NavigationManager.NavigateTo(url.ToString(), true); ;
-            }
-
         }
+        catch(Exception ex)
+        {
+            logger.LogError(ex.Message);
+        }
+    }
+
+    private bool ValidateRedirectFormData(string roomName)
+    {
+        bool ok = false;
+        //Ensure and artist name has been entered
+        if (string.IsNullOrEmpty(artistName.Trim()) == true)
+        {
+            error = "Please enter an artist name you'd like to be known as";
+        }
+        else
+        {
+            ok = true;
+        }
+
+        return ok;
+    }
+
+    private void RedirectToRoom(string roomName)
+    {
+        StringBuilder url = new StringBuilder()
+            .Append("SketchRoom?RoomName=")
+            .Append(roomName)
+            .Append("&ArtistName=")
+            .Append(artistName);
+
+        NavigationManager.NavigateTo(url.ToString(), true); ;
+    }
+
+}
 
