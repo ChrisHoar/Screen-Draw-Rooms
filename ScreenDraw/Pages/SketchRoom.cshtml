@@ -1,0 +1,103 @@
+﻿@page
+@using ScreenDraw.Interfaces
+@using Microsoft.Extensions.Logging;
+@inject IList<IColourListItem> ColourValues
+@inject ISketchRooms sketchRooms
+@inject ILogger<SketchRoomModel> logger;
+@{
+    var qs = Request.QueryString;
+    var roomName = string.Empty;
+    var artistName = string.Empty;
+    object currentImage = null;
+
+    try
+    {
+        Func<string, string, string> FilterQS = (QueryString, Find) =>
+        {
+            string ret = string.Empty;
+
+            //Filter the QueryString by finding the value that
+            //matches the element named in the Find param and returning it
+
+            var items = QueryString.Replace("?", "").Split('&');
+            foreach (string s in items)
+            {
+                //This will be a key value pair on either side of the "=" sign
+                if (s.Split('=').Length > 0 && s.Split('=')[0] == Find)
+                {
+                    ret = s.Split('=')[1];
+                }
+            }
+
+            return ret;
+        };
+
+        if (qs.HasValue == true)
+        {
+
+            roomName = FilterQS(qs.Value, "RoomName");
+            artistName = FilterQS(qs.Value, "ArtistName");
+
+            currentImage = sketchRooms.Rooms.Where(r => r.Name == roomName).FirstOrDefault().CurrentImage;
+        }
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex.Message);
+    }
+
+}
+
+<div style="position: absolute; left: 5px; top: 5px; font-size:large;">
+    <label>Select Colour</label>
+    <select id="colours">
+        @{
+            foreach (IColourListItem item in ColourValues)
+            {
+                @:<option value="@item.Value ">
+                    @item.Text
+                @:</option>
+            }
+        }
+
+
+    </select>
+
+    <input type="button" onclick="clearCanvas();" value="Clear Canvas" />
+
+</div>
+
+ @*
+     Temporary image used to add the current state of the image in the room to new users entering the room.
+     The SetImage function adds it to the canvas. The currentImage is data held in the room
+     instance, and is passed back in the DrawHub each time a user stops drawing.
+     This image is hidden once teh canvas is updated
+ *@
+
+<img src="@currentImage" id="currentImage" style=" position: absolute; top: 40px; left: 5px" width="350" height="550" />
+
+<canvas data="" id="canvas" style="border: solid 1px blue; position: absolute; top: 40px; left: 5px" width="350" height="550">
+</canvas>
+
+<div>
+    <input type="hidden" id="roomName" value="@roomName" />
+</div>
+
+
+
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/draw.js"></script>
+<script>window.onload = SetImage();
+
+
+    function SetImage() {
+        var context = canvas.getContext('2d');
+
+        var img = document.getElementById("currentImage");
+
+        context.drawImage(img, 0, 0, img.width, img.height);
+        img.style.visibility = "hidden";
+    };
+</script>
+
