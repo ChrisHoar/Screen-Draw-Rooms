@@ -17,6 +17,8 @@ namespace ScreenDraw.Controllers
         }
 
 
+
+
         [HttpPost]
         public JsonResult ImageData([FromBody] object Data)
         {
