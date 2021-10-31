@@ -12,9 +12,14 @@ connection.on("ReceiveColourData", function (colour) {
     selectElement("colours", colour);
 });
 
-connection.on("ReceiveResetDataCommand", function (colour) {
+connection.on("ReceiveResetDataCommand", function () {
     Reset();
 });
+
+connection.on("ReceiveAddedToRoom", function (success) {
+
+});
+
 
 function selectElement(id, valueToSelect) {
     let element = document.getElementById(id);
@@ -22,8 +27,7 @@ function selectElement(id, valueToSelect) {
 }
 
 connection.start().then(function () {
-    
-
+    connection.invoke("AddUserToRoom", document.getElementById("roomName").value);
 }).catch(function (err) {
     return console.error(err.toString());
 });
@@ -31,8 +35,8 @@ connection.start().then(function () {
 
 document.getElementById("colours").addEventListener("change", function (event) {
     var colour = document.getElementById("colours").options[document.getElementById("colours").selectedIndex].value;
-    
-    connection.invoke("ChangeColour", colour).catch(function (err) {
+    var rn = document.getElementById("roomName").value;
+    connection.invoke("ChangeColour", rn, colour).catch(function (err) {
         return console.error(err.toString());
     });
     event.preventDefault();
@@ -44,7 +48,6 @@ var previousY = 0;
 
 
 document.getElementById("canvas").addEventListener("mousedown", function (event) {
-
     Reset();
     engage = true;       
     event.preventDefault();
@@ -57,9 +60,12 @@ document.getElementById("canvas").addEventListener("mouseup", function (event) {
     //a draw happens the previous X and Y are set to 0 in their
     //instance as well as this one
 
-    connection.invoke("ResetDataCommand").catch(function (err) {
+    var rn = document.getElementById("roomName").value;
+    connection.invoke("ResetDataCommand", rn).catch(function (err) {
             return console.error(err.toString());
-        });
+    });
+
+    passCanvasBack();
     event.preventDefault();
 });
 
@@ -79,7 +85,8 @@ function Reset()
 document.getElementById("canvas").addEventListener("mousemove", function (event) {
 
     if (engage == true) {
-        connection.invoke("SendXAndYData", event.clientX.toString(), event.clientY.toString())
+        var rn = document.getElementById("roomName").value;
+        connection.invoke("SendXAndYData", rn, event.clientX.toString(), event.clientY.toString())
             .catch(function (err) {
                 return console.error(err.toString());
             });
@@ -102,9 +109,12 @@ document.getElementById("canvas").addEventListener("touchend", function (event) 
     //a draw happens the previous X and Y are set to 0 in their
     //instance as well as this one
 
-    connection.invoke("ResetDataCommand").catch(function (err) {
+    var rn = document.getElementById("roomName").value;
+    connection.invoke("ResetDataCommand", rn).catch(function (err) {
         return console.error(err.toString());
     });
+
+    passCanvasBack();
     event.preventDefault();
 });
 
@@ -112,7 +122,8 @@ document.getElementById("canvas").addEventListener("touchend", function (event) 
 
 document.getElementById("canvas").addEventListener("touchmove", function (event) {
     if (engage == true) {
-        connection.invoke("SendXAndYData", event.changedTouches[0].clientX.toString(), event.changedTouches[0].clientY.toString())
+        var rn = document.getElementById("roomName").value;
+        connection.invoke("SendXAndYData", rn, event.changedTouches[0].clientX.toString(), event.changedTouches[0].clientY.toString())
             .catch(function (err) {
                 return console.error(err.toString());
             });
@@ -122,10 +133,26 @@ document.getElementById("canvas").addEventListener("touchmove", function (event)
 });
 
 const canvas = document.querySelector('#canvas');
-const ctx = canvas.getContext('2d');
+
+function passCanvasBack()
+{
+    //Pass image data back to the server. This is used as a starting point
+    //when new people enter the room
+
+    var rn = document.getElementById("roomName").value;
+    var image = document.getElementById("canvas").toDataURL("image/png");
+
+    connection.invoke("SetCurrentImage", image, rn).catch(function (err) {
+        return console.error(err.toString());
+    });
+}
 
 function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+    document.getElementById("currentImage").style.display = 'none';
+
 }
 
 function draw(X, Y, colour) {
@@ -137,7 +164,7 @@ function draw(X, Y, colour) {
     if (!canvas.getContext) {
         return;
     }
-    //const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
 
     if (previousX == 0) {
         previousX = X - rect.x;

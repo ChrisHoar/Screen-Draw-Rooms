@@ -8,10 +8,26 @@
     </IncludeSetACLProviderOnDestination>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove="Hubs\" />
+    <None Remove="Classes\" />
+    <None Remove="Interfaces\" />
+    <None Remove="Microsoft.AspNetCore.Components.WebAssembly.Server" />
+    <None Remove="Controllers\" />
+    <None Remove="Component\" />
+    <None Remove="Component\Pages\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Hubs\" />
+    <Folder Include="Classes\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Controllers\" />
+    <Folder Include="Components\" />
+    <Folder Include="Components\Pages\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.11" />
   </ItemGroup>
 </Project>

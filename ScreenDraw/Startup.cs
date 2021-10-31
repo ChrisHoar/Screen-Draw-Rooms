@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ScreenDraw.Classes;
 using ScreenDraw.Hubs;
+using ScreenDraw.Interfaces;
+using System.Collections.Concurrent;
 
 namespace ScreenDraw
 {
@@ -25,10 +28,27 @@ namespace ScreenDraw
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
-            services.AddSignalR();
+
+            services.AddServerSideBlazor();
+            //services.AddSignalR();
+
+            services.AddSignalR(o =>
+            {
+                o.EnableDetailedErrors = true;
+                o.MaximumReceiveMessageSize = null; // bytes
+            });
+
+            services.AddControllersWithViews();
+
             // Inject a colour list for the colour drop down
             // For the moment add this as a singleton as its currently never changing
-            services.Add(new ServiceDescriptor(typeof(IList<IColourListItem>), ColourListFactory.GetColourListObject()));    
+            services.Add(new ServiceDescriptor(typeof(IList<IColourListItem>), ColourListFactory.GetColourListObject()));
+
+            //Inject a SketchRooms object as a singleton. This will hold all the information about
+            //the rooms and the artists inside those rooms, and will persist for as long as there are users,
+            //or until it expires, (where no one has used the site for a while).
+            //TODO Replace the SketchRooms singeton with a permanent form of storage, database, flat files etc.
+            services.Add(new ServiceDescriptor(typeof(ISketchRooms), new SketchRooms()));
 
         }
 
@@ -53,9 +73,11 @@ namespace ScreenDraw
 
             app.UseAuthorization();
 
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapBlazorHub();
                 endpoints.MapHub<DrawHub>("/drawHub");
             });
         }
