@@ -7,8 +7,6 @@ namespace ScreenDraw.Classes
         public string Token { get; set; }
         public string Name { get; set; }
 
-        public Artist()
-        {
-        }
+
     }
 }
