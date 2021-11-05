@@ -3,9 +3,9 @@ namespace ScreenDraw.Classes
 {
     public static class Helper
     {
-        public static void DebugLog(string message)
+        public static void DebugLog(string Message)
         {
-            System.Diagnostics.Debug.WriteLine(message);
+            System.Diagnostics.Debug.WriteLine(Message);
         }
     }
 }

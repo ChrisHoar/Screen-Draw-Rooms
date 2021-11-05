@@ -13,12 +13,12 @@ namespace ScreenDraw.Hubs
     public class DrawHub : Hub
     {
 
-        ISketchRooms _sketchRooms;
-        private readonly ILogger<DrawHub> _logger;
+        ISketchRooms sketchRooms;
+        private readonly ILogger<DrawHub> logger;
         public DrawHub(ISketchRooms sketchRooms, ILogger<DrawHub> logger)
         {
-            _sketchRooms = sketchRooms;
-            _logger = logger;
+            this.sketchRooms = sketchRooms;
+            this.logger = logger;
         }
 
         public async override Task OnConnectedAsync()
@@ -35,7 +35,7 @@ namespace ScreenDraw.Hubs
             try
             {
                 //Get the room that relates to this users ConnectionId
-                foreach (IRoom room in _sketchRooms.Rooms)
+                foreach (IRoom room in sketchRooms.Rooms)
                 {
                     if (room.Artists.Select(a => a.Token == Context.ConnectionId).Count() > 0)
                     {
@@ -44,17 +44,17 @@ namespace ScreenDraw.Hubs
                 }
 
                 //Get the artist that relates to this users ConnectionId
-                IArtist artist = _sketchRooms.Rooms
+                IArtist artist = sketchRooms.Rooms
                     .Where(r => r.Name == roomName).First()
                     .Artists.Where(a => a.Token == Context.ConnectionId).FirstOrDefault();
 
                 //Remove the user from the rooms artists list
-                _sketchRooms.Rooms.Where(r => r.Name == roomName).FirstOrDefault()
+                sketchRooms.Rooms.Where(r => r.Name == roomName).FirstOrDefault()
                     .Artists.Remove(artist);
             }
             catch(Exception exc)
             {
-                _logger.LogError(exc.Message);
+                logger.LogError(exc.Message);
             }
 
         }
@@ -68,7 +68,7 @@ namespace ScreenDraw.Hubs
             try
             {
                 //Get the room object
-                var room = _sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault<IRoom>();
+                var room = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault<IRoom>();
 
                 if (room != null)
                 {
@@ -89,7 +89,7 @@ namespace ScreenDraw.Hubs
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                logger.LogError(ex.Message);
             }
 
 
@@ -109,7 +109,7 @@ namespace ScreenDraw.Hubs
 
         public void SetCurrentImage(string Image, string RoomName)
         {
-            _sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName))
+            sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName))
                 .FirstOrDefault().CurrentImage = Image;
 
         }

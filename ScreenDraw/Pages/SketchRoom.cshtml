@@ -5,41 +5,18 @@
 @inject ISketchRooms sketchRooms
 @inject ILogger<SketchRoomModel> logger;
 @{
-    var qs = Request.QueryString;
     var roomName = string.Empty;
     var artistName = string.Empty;
     object currentImage = null;
 
     try
     {
-        Func<string, string, string> FilterQS = (QueryString, Find) =>
+        if (Request.QueryString.HasValue == true)
         {
-            string ret = string.Empty;
-
-            //Filter the QueryString by finding the value that
-            //matches the element named in the Find param and returning it
-
-            var items = QueryString.Replace("?", "").Split('&');
-            foreach (string s in items)
-            {
-                //This will be a key value pair on either side of the "=" sign
-                if (s.Split('=').Length > 0 && s.Split('=')[0] == Find)
-                {
-                    ret = s.Split('=')[1];
-                }
-            }
-
-            return ret;
-        };
-
-        if (qs.HasValue == true)
-        {
-
-            roomName = FilterQS(qs.Value, "RoomName");
-            artistName = FilterQS(qs.Value, "ArtistName");
-
-            currentImage = sketchRooms.Rooms.Where(r => r.Name == roomName).FirstOrDefault().CurrentImage;
+            roomName = Request.Query["RoomName"];
+            artistName = Request.Query["ArtistName"];
         }
+        currentImage = sketchRooms.Rooms.Where(r => r.Name == roomName).FirstOrDefault().CurrentImage;
     }
     catch (Exception ex)
     {
