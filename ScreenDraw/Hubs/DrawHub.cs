@@ -91,11 +91,8 @@ namespace ScreenDraw.Hubs
             {
                 logger.LogError(ex.Message);
             }
-
-
         }
-        
-
+       
         public Task SendXAndYData(string RoomName, string X, string Y, string Colour)
             => Clients.Group(RoomName).SendAsync("ReceiveXYData", X, Y, Colour);
         
