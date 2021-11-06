@@ -6,7 +6,7 @@
 @using System.Text;
 @using Microsoft.Extensions.Logging;
 @inject ISketchRooms sketchRooms;
-@inject NavigationManager NavigationManager
+@inject NavigationManager navigationManager
 @inject ILogger<RoomList> logger
 
 @{
@@ -156,7 +156,7 @@
             .Append("&ArtistName=")
             .Append(artistName);
 
-        NavigationManager.NavigateTo(url.ToString(), true); ;
+        navigationManager.NavigateTo(url.ToString(), true); ;
     }
 
     private void BeginRedirectToRoom(string roomName)
@@ -198,7 +198,7 @@
             .Append("&ArtistName=")
             .Append(artistName);
 
-        NavigationManager.NavigateTo(url.ToString(), true); ;
+        navigationManager.NavigateTo(url.ToString(), true); ;
     }
 
 }
