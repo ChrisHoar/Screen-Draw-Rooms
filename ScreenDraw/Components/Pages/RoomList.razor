@@ -5,9 +5,11 @@
 @using ScreenDraw.Classes;
 @using System.Text;
 @using Microsoft.Extensions.Logging;
+@using Microsoft.AspNetCore.Http;
 @inject ISketchRooms sketchRooms;
 @inject NavigationManager navigationManager
 @inject ILogger<RoomList> logger
+@inject IHttpContextAccessor _httpContext
 
 @{
     var sketchRoomsCount = sketchRooms.Rooms is null ? 0 : sketchRooms.Rooms.Count;
@@ -41,7 +43,7 @@
         <div class="d-flex flex-wrap">
             <div class="p-2 col-md-8">Your Artist Name</div>
             @*SECURITY: Razor automatically encodes input to help prevent XSS (cross-site scripting attacks i.e. <script>
-                        injection into output from input) *@
+                injection into output from input) *@
             <div class="p-2 col-md-8"><input id="artistName" @bind="@artistName" /></div>
         </div>
     </div>
@@ -103,6 +105,18 @@
     private string artistName = string.Empty;
     private string error = string.Empty;
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        artistName = CheckForArtistName();
+    }
+
+    private string CheckForArtistName()
+    {
+        //If the artist name has aready been entered persist that in the artist name input box
+        return string.IsNullOrEmpty(_httpContext.HttpContext.Session.GetString("ArtistName")) ? string.Empty : _httpContext.HttpContext.Session.GetString("ArtistName");
+    }
+
     private void IncrementCount()
     {
         currentCount++;
@@ -117,7 +131,7 @@
                 CreateRoom();
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger.LogError(ex.Message);
         }
@@ -168,7 +182,7 @@
                 RedirectToRoom(roomName);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger.LogError(ex.Message);
         }

@@ -1,9 +1,11 @@
 ﻿@page
 @using ScreenDraw.Interfaces
 @using Microsoft.Extensions.Logging;
+@using Microsoft.AspNetCore.Http;
 @inject IList<IColourListItem> ColourValues
 @inject ISketchRooms sketchRooms
 @inject ILogger<SketchRoomModel> logger;
+@inject IHttpContextAccessor _httpContext
 @{
     var roomName = string.Empty;
     var artistName = string.Empty;
@@ -15,6 +17,7 @@
         {
             roomName = Request.Query["RoomName"];
             artistName = Request.Query["ArtistName"];
+            _httpContext.HttpContext.Session.SetString("ArtistName", artistName);
         }
         currentImage = sketchRooms.Rooms.Where(r => r.Name == roomName).FirstOrDefault().CurrentImage;
     }
@@ -36,18 +39,20 @@
                 @:</option>
             }
         }
+
+
     </select>
 
     <input type="button" onclick="clearCanvas();" value="Clear Canvas" />
 
 </div>
 
- @*
-     Temporary image used to add the current state of the image in the room to new users entering the room.
-     The SetImage function adds it to the canvas. The currentImage is data held in the room
-     instance, and is passed back in the DrawHub each time a user stops drawing.
-     This image is hidden once teh canvas is updated
- *@
+@*
+    Temporary image used to add the current state of the image in the room to new users entering the room.
+    The SetImage function adds it to the canvas. The currentImage is data held in the room
+    instance, and is passed back in the DrawHub each time a user stops drawing.
+    This image is hidden once teh canvas is updated
+*@
 
 <img src="@currentImage" id="currentImage" style=" position: absolute; top: 40px; left: 5px" width="350" height="550" />
 
@@ -56,6 +61,7 @@
 
 <div>
     <input type="hidden" id="roomName" value="@roomName" />
+    <input type="hidden" id="artistName" value="@artistName" />
 </div>
 
 
@@ -73,6 +79,5 @@
 
         context.drawImage(img, 0, 0, img.width, img.height);
         img.style.visibility = "hidden";
-    };
-</script>
+    };</script>
 

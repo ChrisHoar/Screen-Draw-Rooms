@@ -32,6 +32,9 @@ namespace ScreenDraw
             services.AddServerSideBlazor();
             //services.AddSignalR();
 
+            services.AddSession();
+            services.AddHttpContextAccessor();
+
             services.AddSignalR(o =>
             {
                 o.EnableDetailedErrors = true;
@@ -74,6 +77,8 @@ namespace ScreenDraw
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseSession();
 
 
             app.UseEndpoints(endpoints =>

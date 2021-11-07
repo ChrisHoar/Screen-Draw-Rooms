@@ -92,6 +92,8 @@ document.getElementById("canvas").addEventListener("touchmove", function (event)
     move(event, event.changedTouches[0].clientX.toString(), event.changedTouches[0].clientY.toString());
 });
 
+
+
 function startDrawing(event) {
     Reset();
     engage = true;
