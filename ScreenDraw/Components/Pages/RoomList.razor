@@ -10,7 +10,9 @@
 @inject NavigationManager navigationManager
 @inject ILogger<RoomList> logger
 @inject IHttpContextAccessor _httpContext
-
+@*INHERIT - THIS IS BECAUSE THE @code BLOCK WAS MOVED TO A BASE CLASS*@ 
+@inherits ScreenDraw.Components.Pages.RoomlistBase;  
+@page "/RoomList"
 @{
     var sketchRoomsCount = sketchRooms.Rooms is null ? 0 : sketchRooms.Rooms.Count;
 }
@@ -55,7 +57,7 @@
 
     </div>
     <div class="row">
-        <div class="p-2 col-md-8"><button class="btn btn-primary" @onclick="() => BeginCreateRoom()" @onclick:preventDefault>Create Room</button></div>
+        <div class="p-2 col-md-8"><button id="createRoomButton" class="btn btn-primary" @onclick="() => BeginCreateRoom()" @onclick:preventDefault>Create Room</button></div>
     </div>
 </div>
 
@@ -100,7 +102,9 @@
 
 
 @code {
-    private int currentCount = 0;
+    
+    
+    @*private int currentCount = 0;
     private string newRoomName = string.Empty;
     private string artistName = string.Empty;
     private string error = string.Empty;
@@ -137,7 +141,7 @@
         }
     }
 
-    public bool ValidateCreateFormData()
+    private bool ValidateCreateFormData()
     {
         bool ok = false;
         //Ensure a unique room name and also an artist name have been entered
@@ -213,7 +217,7 @@
             .Append(artistName);
 
         navigationManager.NavigateTo(url.ToString(), true); ;
-    }
+    }*@
 
 }
 

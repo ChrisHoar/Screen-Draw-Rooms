@@ -18,10 +18,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="bunit" Version="1.2.49" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ScreenDraw\ScreenDraw.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="bunit" />
+  </ItemGroup>
 </Project>
