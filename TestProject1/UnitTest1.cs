@@ -10,6 +10,9 @@ using Bunit;
 using ScreenDraw.Components.Pages;
 using ScreenDraw.Classes;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
 
 namespace TestProject1
 {
@@ -52,20 +55,31 @@ namespace TestProject1
 
         }
 
-        //[Fact]
-        //public void CheckChangingArtistNameUpdatesInputField()
-        //{
-        //    HttpContextAccessor cont = new HttpContextAccessor();
-        //    using var ctx = new TestContext();
-        //    var obj = ctx.RenderComponent<RoomList>();
+        [Fact]
+        public void CheckChangingArtistNameUpdatesInputField()
+        {
+           
+            using var ctx = new TestContext();
+            ctx.Services.AddSingleton<IHttpContextAccessor>(new HttpContextAccessor());
+       
+            //ctx.Services.AddSingleton<NavigationManager>(new NavigationManager());
 
-        //    ((RoomlistBase)obj).HttpContextAccessor = cont;
-            
+            ISketchRooms sketchrooms = new SketchRooms();
+            sketchrooms.Rooms = new List<IRoom>();
+            ctx.Services.Add(new ServiceDescriptor(typeof(ISketchRooms), sketchrooms));
 
-        //    ((RoomlistBase)obj).artistName = "Test Artist";
+            ILogger<RoomList> logger = new LoggerFactory().CreateLogger<RoomList>();
+            ctx.Services.Add(new ServiceDescriptor(typeof(ILogger<RoomList>), logger));
 
 
-        //    obj.Find("artistName").MarkupMatches("<input id='artistName' value='Test Artist' />", "Updating artist name variable does not update the input field");
-        //}
+            var obj = ctx.RenderComponent<RoomList>();
+
+   
+
+            ((RoomlistBase)obj).artistName = "Test Artist";
+
+
+            obj.Find("artistName").MarkupMatches("<input id='artistName' value='Test Artist' />", "Updating artist name variable does not update the input field");
+        }
     }
 }
