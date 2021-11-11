@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ScreenDraw.Classes;
 using ScreenDraw.Interfaces;
 
 namespace ScreenDraw.Interfaces
@@ -8,5 +9,7 @@ namespace ScreenDraw.Interfaces
         string Name { get; set; }
         List<IArtist> Artists { get; }
         string CurrentImage { get; set; }
+        LimitedSizeStack<string> UndoStack { get; set; }
+        LimitedSizeStack<string> RedoStack { get; set; }
     }
 }

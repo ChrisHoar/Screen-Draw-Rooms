@@ -94,9 +94,12 @@ namespace ScreenDraw.Hubs
         }
 
 
-        public Task SendXAndYData(string RoomName, string X, string Y, string Colour)
-            => Clients.Group(RoomName).SendAsync("ReceiveXYData", X, Y, Colour);
-        
+        public Task SendXAndYData(string RoomName, string X, string Y, string Colour, string Shape)
+            => Clients.Group(RoomName).SendAsync("ReceiveXYData", X, Y, Colour, Shape);
+
+        public Task SendStartXAndYData(string RoomName, string X, string Y)
+            => Clients.Group(RoomName).SendAsync("ReceiveStartXAndYData", X, Y);
+
 
         public Task ChangeColour(string RoomName, string Colour)
             => Clients.Group(RoomName).SendAsync("ReceiveColourData", Colour);
@@ -107,9 +110,75 @@ namespace ScreenDraw.Hubs
 
         public void SetCurrentImage(string Image, string RoomName)
         {
-            sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName))
-                .FirstOrDefault().CurrentImage = Image;
+            //Called after a draw completes. It is used when people first join the room so
+            //they are presented with the current state of the canvas
+
+            IRoom room = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault();
+            room.CurrentImage = Image;
 
         }
+
+        public void AddToUndoStack(string Image, string RoomName)
+        {
+            //This is called when a draw on the canvas begins. It is the snapshot of the canvas
+            //before it changes.
+            IRoom room = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault();
+            if (room.UndoStack is null)
+            {
+                //Limit the size of the undo and redo stacks to 30 elements
+                room.UndoStack = new LimitedSizeStack<string>(30);
+                room.RedoStack = new LimitedSizeStack<string>(30);
+            }
+            room.UndoStack.Push(Image);
+        }
+
+        public async Task DoUndoAndReturnImage(string CurrentImage, string RoomName)
+        {
+            string returnImage = string.Empty;
+            LimitedSizeStack<string> undoStack = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault().UndoStack;
+            LimitedSizeStack<string> redoStack = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault().RedoStack;
+
+            if (undoStack is not null && undoStack.Count > 0)
+            {
+                //Get the image to undo to
+                undoStack.TryPop(out returnImage);
+                //Add it to redo stack
+                redoStack.Push(CurrentImage);
+
+            }
+            else
+            {
+                returnImage = "";
+            }
+
+            //Return the previous image to the client
+            await Clients.Group(RoomName).SendAsync("RecieveLastImageAfterUndoRedo", returnImage);
+        }
+
+        public async Task DoRedoAndReturnImage(string Image, string RoomName)
+        {
+            string returnImage = string.Empty;
+            LimitedSizeStack<string> undoStack = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault().UndoStack;
+            LimitedSizeStack<string> redoStack = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault().RedoStack;
+
+            if (redoStack is not null && redoStack.Count > 0)
+            {
+                //Get the image to redo to and remove it from the stack
+                redoStack.TryPop(out returnImage);
+
+                //Add passed image, (the one we are undoinf from), to undo stack
+                undoStack.Push(Image);
+
+            }
+            else
+            {
+                //There is nothing to redo to, therefore redo to the current image
+                returnImage = Image;
+            }
+
+            //Return the previous image to the client
+            await Clients.Group(RoomName).SendAsync("RecieveLastImageAfterUndoRedo", returnImage);
+        }
+
     }
 }

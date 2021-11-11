@@ -6,6 +6,7 @@
 @inject ISketchRooms sketchRooms
 @inject ILogger<SketchRoomModel> logger;
 @inject IHttpContextAccessor _httpContext
+
 @{
     var roomName = string.Empty;
     var artistName = string.Empty;
@@ -29,7 +30,7 @@
 }
 
 <div style="position: absolute; left: 5px; top: 5px; font-size:large;">
-    <label>Select Colour</label>
+    @*<label>Select Colour</label>*@
     <select id="colours">
         @{
             foreach (IColourListItem item in ColourValues)
@@ -42,8 +43,17 @@
 
 
     </select>
+    <select id="shapes" name="shapes">
+        <option value="free">Free</option>
+        <option value="line">Line</option>
+        <option value="square">Square</option>
+        <option value="circle">Circle</option>
+        <option value="ellipse">Ellipse</option>
+    </select>
 
-    <input type="button" onclick="clearCanvas();" value="Clear Canvas" />
+    @*<input type="button" onclick="clearCanvas();" value="Clear" />*@
+    <input type="button" onclick="undo();" value="Undo" />
+    <input type="button" onclick="redo();" value="Redo" />
 
 </div>
 
@@ -69,7 +79,9 @@
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/draw.js"></script>
-<script>window.onload = SetImage();
+<script>
+
+    window.onload = SetImage();
 
 
     function SetImage() {
@@ -78,6 +90,10 @@
         var img = document.getElementById("currentImage");
 
         context.drawImage(img, 0, 0, img.width, img.height);
+
         img.style.visibility = "hidden";
-    };</script>
+    };
+
+</script>
+
 
