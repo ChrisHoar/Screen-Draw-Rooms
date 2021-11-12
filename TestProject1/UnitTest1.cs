@@ -60,7 +60,14 @@ namespace TestProject1
         {
            
             using var ctx = new TestContext();
-            ctx.Services.AddSingleton<IHttpContextAccessor>(new HttpContextAccessor());
+
+            var httpContextAcessor = new HttpContextAccessor();
+
+            httpContextAcessor.HttpContext = new DefaultHttpContext();
+       
+            //ctx.Services.AddSingleton<IHttpContextAccessor>(httpContextAcessor);
+            ctx.Services.AddHttpContextAccessor();
+            ctx.Services.AddSession();
        
             //ctx.Services.AddSingleton<NavigationManager>(new NavigationManager());
 

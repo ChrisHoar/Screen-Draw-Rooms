@@ -34,7 +34,6 @@ namespace ScreenDraw.Components.Pages
         protected override Task OnInitializedAsync()
         {
             return base.OnInitializedAsync();
-
         }
 
         protected override void OnInitialized()
@@ -46,7 +45,9 @@ namespace ScreenDraw.Components.Pages
         private string CheckForArtistName()
         {
             //If the artist name has aready been entered persist that in the artist name input box
-            return string.IsNullOrEmpty(this.HttpContextAccessor.HttpContext.Session.GetString("ArtistName")) ? string.Empty : this.HttpContextAccessor.HttpContext.Session.GetString("ArtistName");
+            return string.IsNullOrEmpty(this.HttpContextAccessor.HttpContext.Session.GetString("ArtistName")) 
+                ? string.Empty 
+                : this.HttpContextAccessor.HttpContext.Session.GetString("ArtistName");
         }
 
         public void BeginCreateRoom()
