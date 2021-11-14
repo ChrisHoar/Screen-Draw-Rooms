@@ -160,6 +160,10 @@ function startDrawing(event, X, Y) {
     //Set the shape so we know what to draw
     //Send startX and Y coordinates
 
+    var rect = document.getElementById("canvas").getBoundingClientRect();
+    X = X - rect.x;
+    Y = Y - rect.y;
+
     connection.invoke("SendStartXAndYData", roomName, X.toString(), Y.toString())
         .catch(function (err) {
             return console.error(err.toString());
@@ -194,7 +198,12 @@ function move(event, X, Y) {
         var colour = document.getElementById("colours").options[document.getElementById("colours").selectedIndex].value;
 
         var shape = document.getElementById("shapes").options[document.getElementById("shapes").selectedIndex].value;
-        connection.invoke("SendXAndYData", roomName, X, Y, colour, shape)
+
+        var rect = document.getElementById("canvas").getBoundingClientRect();
+        X = X - rect.x;
+        Y = Y - rect.y;
+
+        connection.invoke("SendXAndYData", roomName, X.toString(), Y.toString(), colour, shape)
             .catch(function (err) {
                 return console.error(err.toString());
             });
@@ -298,11 +307,13 @@ function draw(X, Y, colour, shape) {
     //The following code will scroll drawing actions into view on
     //devices where the screen is smaller than the canvas size
 
+    var rect = document.getElementById("canvas").getBoundingClientRect();
     var element = document.getElementById("tracker");
     element.style.position = "absolute";
     element.style.left = X + "px";
     element.style.top = Y + "px";
-    element.scrollIntoView();
+    element.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+
 }
 
 function drawFreeLine(X, Y, colour, lineWidth) {
@@ -316,19 +327,19 @@ function drawFreeLine(X, Y, colour, lineWidth) {
     }
 
     if (previousX == 0) {
-        previousX = X - rect.x;
+        previousX = X; // - rect.x;
     }
 
     if (previousY == 0) {
-        previousY = Y - rect.y;
+        previousY = Y // - rect.y;
     }
 
     // set line stroke and line width
     ctx.strokeStyle = colour;
     ctx.lineWidth = lineWidth;
 
-    X = X - rect.x;
-    Y = Y - rect.y;
+    //X = X - rect.x;
+    //Y = Y - rect.y;
 
     // draw a red line
 
@@ -342,7 +353,6 @@ function drawFreeLine(X, Y, colour, lineWidth) {
 
     previousX = X;
     previousY = Y;
-
 
 }
 
@@ -369,7 +379,9 @@ function drawSquare(startX, startY, X, Y, colour, lineWidth) {
     // draw a square
 
     ctx.beginPath();
-    ctx.rect(startX - rect.x, startY - rect.y, width, height);
+    //ctx.rect(startX - rect.x, startY - rect.y, width, height);
+
+    ctx.rect(startX, startY, width, height);
     ctx.stroke();
 
 }
@@ -396,7 +408,9 @@ function drawCircle(startX, startY, X, Y, colour, lineWidth) {
     }
 
     ctx.beginPath();
-    ctx.arc(startX - rect.x, startY - rect.y, radius, 0, 2 * Math.PI);
+    //ctx.arc(startX - rect.x, startY - rect.y, radius, 0, 2 * Math.PI);
+
+    ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
     ctx.stroke();
 
 }
@@ -412,10 +426,11 @@ function drawEllipse(startX, startY, X, Y, colour, lineWidth) {
 
     ctx.putImageData(startingImageData, 0, 0);
 
-    startX = startX - rect.x;
-    startY = startY - rect.y;
+    //startX = startX - rect.x;
+    //startY = startY - rect.y;
 
     // set line stroke and line width
+
     ctx.strokeStyle = colour;
     ctx.lineWidth = lineWidth;
     ctx.save();
@@ -444,8 +459,8 @@ function drawStraightLine(startX, startY, X, Y, colour, lineWidth) {
 
     ctx.putImageData(startingImageData, 0, 0);
 
-    startX = startX - rect.x;
-    startY = startY - rect.y;
+    //startX = startX - rect.x;
+    //startY = startY - rect.y;
 
     // set line stroke and line width
     ctx.strokeStyle = colour;
@@ -453,7 +468,9 @@ function drawStraightLine(startX, startY, X, Y, colour, lineWidth) {
 
     ctx.beginPath();
     ctx.moveTo(startX, startY);
-    ctx.lineTo(X - rect.x, Y - rect.y);
+   // ctx.lineTo(X - rect.x, Y - rect.y);
+
+    ctx.lineTo(X, Y);
     ctx.stroke();
 
 }
