@@ -13,6 +13,7 @@ let startX = 0;
 let startY = 0;
 let startingImage = new Image();
 let startingImageData = null;
+let zoomRatio = 1;
 
 connection.on("ReceiveXYData", function (X, Y, colour, shape) {
     
@@ -293,6 +294,15 @@ function draw(X, Y, colour, shape) {
             drawStraightLine(startX, startY, X, Y, colour, lineWidth);
             break;
     }
+
+    //The following code will scroll drawing actions into view on
+    //devices where the screen is smaller than the canvas size
+
+    var element = document.getElementById("tracker");
+    element.style.position = "absolute";
+    element.style.left = X + "px";
+    element.style.top = Y + "px";
+    element.scrollIntoView();
 }
 
 function drawFreeLine(X, Y, colour, lineWidth) {
@@ -332,6 +342,7 @@ function drawFreeLine(X, Y, colour, lineWidth) {
 
     previousX = X;
     previousY = Y;
+
 
 }
 

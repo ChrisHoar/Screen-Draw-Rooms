@@ -54,6 +54,7 @@
     @*<input type="button" onclick="clearCanvas();" value="Clear" />*@
     <input type="button" onclick="undo();" value="Undo" />
     <input type="button" onclick="redo();" value="Redo" />
+    
 
 </div>
 
@@ -64,15 +65,22 @@
     This image is hidden once teh canvas is updated
 *@
 
-<img src="@currentImage" id="currentImage" style=" position: absolute; top: 40px; left: 5px" width="350" height="550" />
+@*<img src="@currentImage" id="currentImage" style=" position: absolute; top: 40px; left: 5px" width="350" height="550" />
 
 <canvas data="" id="canvas" style="border: solid 1px blue; position: absolute; top: 40px; left: 5px" width="350" height="550">
+</canvas>*@
+<div style="overflow:scroll;">
+<img src="@currentImage" id="currentImage" style=" position: absolute; top: 40px; left: 5px" width="1400" height="800" />
+<canvas data="" id="canvas" style="border: solid 1px blue; position: absolute; top: 40px; left: 5px" width="1400" height="800">
 </canvas>
+</div>
 
 <div>
     <input type="hidden" id="roomName" value="@roomName" />
     <input type="hidden" id="artistName" value="@artistName" />
 </div>
+
+<div id="tracker"></div>
 
 
 
