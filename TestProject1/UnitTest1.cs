@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Builder;
 
 namespace TestProject1
 {
@@ -55,40 +56,42 @@ namespace TestProject1
 
         }
 
-        //[Fact]
-        //public void CheckChangingArtistNameUpdatesInputField()
-        //{
-           
-        //    using var ctx = new TestContext();
+        [Fact]
+        public void CheckChangingArtistNameUpdatesInputField()
+        {
 
-        //    var httpContextAcessor = new HttpContextAccessor();
+            using var ctx = new TestContext();
+            var sess = new Mock<ISession>();
+            
+            var httpContextAcessor = new HttpContextAccessor();
 
-        //    httpContextAcessor.HttpContext = new DefaultHttpContext();
-       
-        //    //ctx.Services.AddSingleton<IHttpContextAccessor>(httpContextAcessor);
-        //    //ctx.Services.AddHttpContextAccessor();
-        //    ctx.Services.AddSession(s => s.IdleTimeout = TimeSpan.FromMinutes(30));
+            httpContextAcessor.HttpContext = new DefaultHttpContext();
 
-        //    //httpContextAcessor.HttpContext.Session.SetString("ArtistName", "TestArtist");
+            ctx.Services.AddHttpContextAccessor();
+            ctx.Services.AddSession(s => s.IdleTimeout = TimeSpan.FromMinutes(30));
+            httpContextAcessor.HttpContext.Session = sess.Object;
 
-        //    ctx.Services.Add(new ServiceDescriptor(typeof(HttpContextAccessor), httpContextAcessor));
+            ctx.Services.Add(new ServiceDescriptor(typeof(HttpContextAccessor), httpContextAcessor));
 
-        //    ISketchRooms sketchrooms = new SketchRooms();
-        //    sketchrooms.Rooms = new List<IRoom>();
-        //    ctx.Services.Add(new ServiceDescriptor(typeof(ISketchRooms), sketchrooms));
+            ISketchRooms sketchrooms = new SketchRooms();
+            sketchrooms.Rooms = new List<IRoom>();
+            ctx.Services.Add(new ServiceDescriptor(typeof(ISketchRooms), sketchrooms));
 
-        //    ILogger<RoomList> logger = new LoggerFactory().CreateLogger<RoomList>();
-        //    ctx.Services.Add(new ServiceDescriptor(typeof(ILogger<RoomList>), logger));
-
-
-        //    var obj = ctx.RenderComponent<RoomList>();
-
-   
-
-        //    ((RoomlistBase)obj).artistName = "Test Artist";
+            ILogger<RoomList> logger = new LoggerFactory().CreateLogger<RoomList>();
+            ctx.Services.Add(new ServiceDescriptor(typeof(ILogger<RoomList>), logger));
 
 
-        //    obj.Find("artistName").MarkupMatches("<input id='artistName' value='Test Artist' />", "Updating artist name variable does not update the input field");
-        //}
+            var obj = ctx.RenderComponent<RoomList>();
+
+
+            //  ((RoomlistBase)obj).artistName = "Test Artist";
+
+            //obj.artistName  = "";
+            
+            //var s = obj.Find("artistName");
+            //var s1 = s.NodeValue;
+
+            //obj.Find("artistName").MarkupMatches("<input id='artistName' value='Test Artist' />", "Updating artist name variable does not update the input field");
+        }
     }
 }
