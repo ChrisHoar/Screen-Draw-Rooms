@@ -14,84 +14,60 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
+using System.Linq;
+using UnitTests;
 
 namespace TestProject1
 {
     public class UnitTest1
     {
 
+        [Theory]
+        [InlineData("", "", "Please enter a name for the room you'd like to create")]
+        [InlineData("", "TestRoom", "Please enter the artist name you'd like to be known as")]
+        [InlineData("TestArtist", "", "Please enter a name for the room you'd like to create")]
+        [InlineData("TestArtist", "TestRoom", "")]
 
-        [Fact]
-        public void ValidateCreateRoomDataFails()
-        {
-
-            var rl = new RoomlistBase();
-            rl.artistName = string.Empty;
-            rl.newRoomName = string.Empty;
-            rl.BeginCreateRoom();
-
-            Assert.True(rl.error == "Please enter a name for the room you'd like to create", "BeginCreateRoom with no room name or artist name failed to error");
-
-            rl.artistName = "Test Artist";
-            rl.newRoomName = string.Empty;
-            rl.BeginCreateRoom();
-            Assert.True(rl.error == "Please enter a name for the room you'd like to create", "BeginCreateToom with no room name failed to error");
-
-            rl.artistName = string.Empty;
-            rl.newRoomName = "Test Room";
-            rl.BeginCreateRoom();
-            Assert.True(rl.error == "Please enter the artist name you'd like to be known as", "BeginCreateToom with no room name failed to error");
-
-
-            rl.SketchRooms = new SketchRooms();
-            rl.SketchRooms.Rooms = new System.Collections.Generic.List<IRoom>();
-            rl.SketchRooms.Rooms.Add(new Room() { Name = "Test Room" });
-            rl.artistName = "Test Artist";
-            rl.newRoomName = "Test Room";
-            rl.BeginCreateRoom();
-            Assert.True(rl.error == "A room aleady exists with that name. Please try a different one.", "BeginCreateRoom with duplicate room name failed to error");
-
-            //TODO - Write a test to check the output if all inputs are correct.
-            //This will trigger a Navigation event
-
-        }
-
-        [Fact]
-        public void CheckChangingArtistNameUpdatesInputField()
+        public void ValidateMissingInputFieldErrors(string ArtistName, string RoomName, string Error)
         {
 
             using var ctx = new TestContext();
-            var sess = new Mock<ISession>();
-            
+            var sess = new MockHttpSession();
+
             var httpContextAcessor = new HttpContextAccessor();
 
             httpContextAcessor.HttpContext = new DefaultHttpContext();
 
             ctx.Services.AddHttpContextAccessor();
             ctx.Services.AddSession(s => s.IdleTimeout = TimeSpan.FromMinutes(30));
-            httpContextAcessor.HttpContext.Session = sess.Object;
+            httpContextAcessor.HttpContext.Session = sess;
+            //Add an artist name to the session because this is queried during the initialisation
+            //of the component.
+            ((MockHttpSession)httpContextAcessor.HttpContext.Session).SetString("ArtistName", ArtistName);
 
             ctx.Services.Add(new ServiceDescriptor(typeof(HttpContextAccessor), httpContextAcessor));
 
-            ISketchRooms sketchrooms = new SketchRooms();
+            var sketchrooms = new SketchRooms();
             sketchrooms.Rooms = new List<IRoom>();
             ctx.Services.Add(new ServiceDescriptor(typeof(ISketchRooms), sketchrooms));
 
-            ILogger<RoomList> logger = new LoggerFactory().CreateLogger<RoomList>();
+            var logger = new LoggerFactory().CreateLogger<RoomList>();
             ctx.Services.Add(new ServiceDescriptor(typeof(ILogger<RoomList>), logger));
 
+            //Initialise the RoomList and pass paramaters values to it
+            var cut = ctx.RenderComponent<RoomList>(parameters => parameters
+                .Add(p => p.artistName, ArtistName)
+                .Add(p => p.newRoomName, RoomName)
+                .Add(p => p.error, string.Empty)
+            );
 
-            var obj = ctx.RenderComponent<RoomList>();
+            var button = cut.FindAll("button").Where(i => i.Id == "createRoomButton").FirstOrDefault();
+            button.Click();
+            var errorEl = cut.FindAll("span").Where(i => i.Id == "errorMessage").FirstOrDefault();
+            Assert.Equal(Error, errorEl.TextContent);
 
 
-            //  ((RoomlistBase)obj).artistName = "Test Artist";
-
-            //obj.artistName  = "";
-            
-            //var s = obj.Find("artistName");
-            //var s1 = s.NodeValue;
-
-            //obj.Find("artistName").MarkupMatches("<input id='artistName' value='Test Artist' />", "Updating artist name variable does not update the input field");
         }
+
     }
 }

@@ -22,9 +22,16 @@ namespace ScreenDraw.Components.Pages
         [Inject]
         public IHttpContextAccessor HttpContextAccessor { get; set; }
 
-        public string newRoomName = string.Empty;
-        public string artistName = string.Empty;
-        public string error = string.Empty;
+        [Parameter]
+        public string newRoomName { get; set; }
+        [Parameter]
+        public string artistName { get; set; }
+        [Parameter]
+        public string error { get; set; }
+        [Parameter]
+        public int canvasWidth { get; set; } = 700;
+        [Parameter]
+        public int canvasHeight { get; set; } = 700;
 
         public RoomlistBase()
         {
@@ -77,6 +84,14 @@ namespace ScreenDraw.Components.Pages
             {
                 error = "Please enter the artist name you'd like to be known as";
             }
+            else if (canvasWidth == 0)
+            {
+                error = "Please enter the canvas width";
+            }
+            else if (canvasHeight == 0)
+            {
+                error = "Please enter the canvas height";
+            }
             else if (SketchRooms.Rooms.Where(r => r.Name == newRoomName).Count() > 0)
             {
                 error = "A room aleady exists with that name. Please try a different one.";
@@ -91,7 +106,7 @@ namespace ScreenDraw.Components.Pages
 
         private void CreateRoom()
         {
-            SketchRooms.Rooms.Add(new Room { Name = newRoomName, Artists = new List<IArtist>() });
+            SketchRooms.Rooms.Add(new Room { Name = newRoomName, Artists = new List<IArtist>(), CanvasWidth = canvasWidth, CanvasHeight = canvasHeight });
             StringBuilder url = new StringBuilder()
                 .Append("SketchRoom?RoomName=")
                 .Append(newRoomName)

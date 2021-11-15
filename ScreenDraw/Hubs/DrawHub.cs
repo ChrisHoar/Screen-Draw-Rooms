@@ -94,8 +94,8 @@ namespace ScreenDraw.Hubs
         }
 
 
-        public Task SendXAndYData(string RoomName, string X, string Y, string Colour, string Shape)
-            => Clients.Group(RoomName).SendAsync("ReceiveXYData", X, Y, Colour, Shape);
+        public Task SendXAndYData(string RoomName, string X, string Y, string Colour, string Shape, string LineThickness)
+            => Clients.Group(RoomName).SendAsync("ReceiveXYData", X, Y, Colour, Shape, LineThickness);
 
         public Task SendStartXAndYData(string RoomName, string X, string Y)
             => Clients.Group(RoomName).SendAsync("ReceiveStartXAndYData", X, Y);
