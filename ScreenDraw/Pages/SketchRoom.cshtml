@@ -2,7 +2,7 @@
 @using ScreenDraw.Interfaces
 @using Microsoft.Extensions.Logging;
 @using Microsoft.AspNetCore.Http;
-@inject IList<IColourListItem> ColourValues
+@*@inject IList<IColourListItem> ColourValues*@
 @inject ISketchRooms sketchRooms
 @inject ILogger<SketchRoomModel> logger;
 @inject IHttpContextAccessor _httpContext
@@ -48,7 +48,7 @@
 
         </select>*@
     <select id="shapes" name="shapes">
-        <option value="free">Free Draw</option>
+        <option value="free">Free</option>
         <option value="line">Line</option>
         <option value="square">Square</option>
         <option value="circle">Circle</option>
@@ -59,8 +59,10 @@
     <input type="range" min="1" max="50" value="4" class="slider" id="linethickness">
 
     @*<input type="button" onclick="clearCanvas();" value="Clear" />*@
-    <input type="button" onclick="undo();" value="Undo" />
-    <input type="button" onclick="redo();" value="Redo" />
+    @*<input type="button" onclick="undo();" />*@
+    @*<input type="button" onclick="redo();" value="Redo" />*@
+    <button onclick="undo();"><i class="fa fa-rotate-left"></i></button>
+    <button onclick="redo();"><i class="fa fa-rotate-right"></i></button>
 
 
 </div>

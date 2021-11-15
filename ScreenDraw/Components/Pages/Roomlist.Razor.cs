@@ -29,9 +29,9 @@ namespace ScreenDraw.Components.Pages
         [Parameter]
         public string error { get; set; }
         [Parameter]
-        public int canvasWidth { get; set; } = 700;
+        public int canvasWidth { get; set; } = 345;
         [Parameter]
-        public int canvasHeight { get; set; } = 700;
+        public int canvasHeight { get; set; } = 620;
 
         public RoomlistBase()
         {
@@ -76,11 +76,11 @@ namespace ScreenDraw.Components.Pages
         {
             bool ok = false;
             //Ensure a unique room name and also an artist name have been entered
-            if (string.IsNullOrEmpty(newRoomName.Trim()) == true)
+            if (string.IsNullOrEmpty(newRoomName) == true)
             {
                 error = "Please enter a name for the room you'd like to create";
             }
-            else if (string.IsNullOrEmpty(artistName.Trim()) == true)
+            else if (string.IsNullOrEmpty(artistName) == true)
             {
                 error = "Please enter the artist name you'd like to be known as";
             }
