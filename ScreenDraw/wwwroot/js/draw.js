@@ -14,6 +14,7 @@ let startY = 0;
 let startingImage = new Image();
 let startingImageData = null;
 let zoomRatio = 1;
+let doCanvasScrollInsteadOfDraw = false;
 
 connection.on("ReceiveXYData", function (X, Y, colour, shape, lineThickness) {
 
@@ -192,6 +193,7 @@ function stopDrawing(event) {
 }
 
 function move(event, X, Y) {
+
     //Send draw data coordinates back to the hub, this is then broadcast to all
     //artists in the room (including this one) and is drawn to the canvas
 
@@ -213,6 +215,7 @@ function move(event, X, Y) {
 
         event.preventDefault();
     }
+    
 }
 
 
@@ -274,6 +277,8 @@ function redo() {
 
     event.preventDefault();
 }
+
+
 
 
 function draw(X, Y, colour, shape, lineThickness) {
