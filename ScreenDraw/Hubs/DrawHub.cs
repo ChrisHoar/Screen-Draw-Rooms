@@ -68,7 +68,7 @@ namespace ScreenDraw.Hubs
             try
             {
                 //Get the room object
-                var room = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault<IRoom>();
+                var room = sketchRooms.GetRoom(RoomName);
 
                 if (room != null)
                 {

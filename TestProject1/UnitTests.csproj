@@ -19,6 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="bunit" Version="1.2.49" />
+    <PackageReference Include="SignalR.UnitTestingSupport.xUnit" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,5 +28,6 @@
 
   <ItemGroup>
     <None Remove="bunit" />
+    <None Remove="SignalR.UnitTestingSupport.xUnit" />
   </ItemGroup>
 </Project>
