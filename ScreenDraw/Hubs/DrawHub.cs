@@ -112,10 +112,11 @@ namespace ScreenDraw.Hubs
         {
             //Called after a draw completes. It is used when people first join the room so
             //they are presented with the current state of the canvas
-
             IRoom room = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault();
-            room.CurrentImage = Image;
-
+            if (room is not null)
+            {
+                room.CurrentImage = Image;
+            }
         }
 
         public void AddToUndoStack(string Image, string RoomName)
