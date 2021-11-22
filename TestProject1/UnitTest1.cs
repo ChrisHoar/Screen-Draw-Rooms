@@ -112,7 +112,7 @@ namespace TestProject1
         DrawHub hub;
         string[] connectionIds = { "a", "b", "c", "d", "e" };
 
-
+        [Fact]
         public async Task ReinitialiseSignalRVars()
         {
             //Reinitialize the variables
