@@ -72,6 +72,8 @@ namespace ScreenDraw
             }
 
             app.UseHttpsRedirection();
+
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
