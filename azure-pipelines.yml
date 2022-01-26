@@ -30,6 +30,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
+- task: PublishBuildArtifacts@1
 - task: AzureRmWebAppDeployment@4
   inputs:
     ConnectionType: 'AzureRM'
