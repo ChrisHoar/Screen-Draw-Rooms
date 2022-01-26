@@ -91,7 +91,8 @@ namespace TestProject1
             //var s = obj.Find("artistName");
             //var s1 = s.NodeValue;
 
-            //obj.Find("artistName").MarkupMatches("<input id='artistName' value='Test Artist' />", "Updating artist name variable does not update the input field");
+           // obj.Find("artistName")
+           //     .MarkupMatches("<input id='artistName' value='Test Artist' />", "Updating artist name variable does not update the input field");
         }
     }
 }
