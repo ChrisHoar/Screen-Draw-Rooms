@@ -36,8 +36,5 @@ steps:
     azureSubscription: 'Azure subscription 1(677b286a-db44-4d10-a77a-2571e65a2b86)'
     appType: 'webAppLinux'
     WebAppName: 'ScreenDrawCHNew'
-    deployToSlotOrASE: true
-    ResourceGroupName: 'DefaultResourceGroup-SUK'
-    SlotName: 'production'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
     RuntimeStack: 'DOTNETCORE|5.0'
