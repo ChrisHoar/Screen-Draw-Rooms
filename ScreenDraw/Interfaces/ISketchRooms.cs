@@ -6,6 +6,6 @@ namespace ScreenDraw.Interfaces
     public interface ISketchRooms
     {
         List<IRoom> Rooms { get; set; }
-        
+        IRoom GetRoom(string RoomName);
     }
 }

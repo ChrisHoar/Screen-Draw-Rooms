@@ -22,9 +22,16 @@ namespace ScreenDraw.Components.Pages
         [Inject]
         public IHttpContextAccessor HttpContextAccessor { get; set; }
 
-        public string newRoomName = string.Empty;
-        public string artistName = string.Empty;
-        public string error = string.Empty;
+        [Parameter]
+        public string newRoomName { get; set; }
+        [Parameter]
+        public string artistName { get; set; }
+        [Parameter]
+        public string error { get; set; }
+        [Parameter]
+        public int canvasWidth { get; set; } = 345;
+        [Parameter]
+        public int canvasHeight { get; set; } = 620;
 
         public RoomlistBase()
         {
@@ -69,13 +76,21 @@ namespace ScreenDraw.Components.Pages
         {
             bool ok = false;
             //Ensure a unique room name and also an artist name have been entered
-            if (string.IsNullOrEmpty(newRoomName.Trim()) == true)
+            if (string.IsNullOrEmpty(newRoomName) == true)
             {
                 error = "Please enter a name for the room you'd like to create";
             }
-            else if (string.IsNullOrEmpty(artistName.Trim()) == true)
+            else if (string.IsNullOrEmpty(artistName) == true)
             {
                 error = "Please enter the artist name you'd like to be known as";
+            }
+            else if (canvasWidth == 0)
+            {
+                error = "Please enter the canvas width";
+            }
+            else if (canvasHeight == 0)
+            {
+                error = "Please enter the canvas height";
             }
             else if (SketchRooms.Rooms.Where(r => r.Name == newRoomName).Count() > 0)
             {
@@ -91,7 +106,7 @@ namespace ScreenDraw.Components.Pages
 
         private void CreateRoom()
         {
-            SketchRooms.Rooms.Add(new Room { Name = newRoomName, Artists = new List<IArtist>() });
+            SketchRooms.Rooms.Add(new Room { Name = newRoomName, Artists = new List<IArtist>(), CanvasWidth = canvasWidth, CanvasHeight = canvasHeight });
             StringBuilder url = new StringBuilder()
                 .Append("SketchRoom?RoomName=")
                 .Append(newRoomName)

@@ -2,7 +2,7 @@
 @using ScreenDraw.Interfaces
 @using Microsoft.Extensions.Logging;
 @using Microsoft.AspNetCore.Http;
-@inject IList<IColourListItem> ColourValues
+@*@inject IList<IColourListItem> ColourValues*@
 @inject ISketchRooms sketchRooms
 @inject ILogger<SketchRoomModel> logger;
 @inject IHttpContextAccessor _httpContext
@@ -11,6 +11,8 @@
     var roomName = string.Empty;
     var artistName = string.Empty;
     object currentImage = null;
+    int canvasWidth = default;
+    int canvasHeight = default;
 
     try
     {
@@ -21,6 +23,8 @@
             _httpContext.HttpContext.Session.SetString("ArtistName", artistName);
         }
         currentImage = sketchRooms.Rooms.Where(r => r.Name == roomName).FirstOrDefault().CurrentImage;
+        canvasWidth = sketchRooms.Rooms.Where(r => r.Name == roomName).FirstOrDefault().CanvasWidth;
+        canvasHeight = sketchRooms.Rooms.Where(r => r.Name == roomName).FirstOrDefault().CanvasHeight;
     }
     catch (Exception ex)
     {
@@ -30,19 +34,7 @@
 }
 
 <div style="position: absolute; left: 5px; top: 5px; font-size:large;">
-    @*<label>Select Colour</label>*@
-    <select id="colours">
-        @{
-            foreach (IColourListItem item in ColourValues)
-            {
-                @:<option value="@item.Value ">
-                    @item.Text
-                @:</option>
-            }
-        }
 
-
-    </select>
     <select id="shapes" name="shapes">
         <option value="free">Free</option>
         <option value="line">Line</option>
@@ -51,28 +43,27 @@
         <option value="ellipse">Ellipse</option>
     </select>
 
-    @*<input type="button" onclick="clearCanvas();" value="Clear" />*@
-    <input type="button" onclick="undo();" value="Undo" />
-    <input type="button" onclick="redo();" value="Redo" />
-    
+    <input type="color" id="colours" value="black" />
+    <input type="range" min="1" max="80" value="4" class="slider" id="linethickness">
+
+    <button onclick="undo();"><i class="fa fa-rotate-left"></i></button>
+    <button onclick="redo();"><i class="fa fa-rotate-right"></i></button>
+    @*<button onclick="setStartOrStopCanvasScroll();"><i class="move"></i></button>*@
 
 </div>
 
-@*
-    Temporary image used to add the current state of the image in the room to new users entering the room.
-    The SetImage function adds it to the canvas. The currentImage is data held in the room
-    instance, and is passed back in the DrawHub each time a user stops drawing.
-    This image is hidden once teh canvas is updated
-*@
-
-@*<img src="@currentImage" id="currentImage" style=" position: absolute; top: 40px; left: 5px" width="350" height="550" />
-
-<canvas data="" id="canvas" style="border: solid 1px blue; position: absolute; top: 40px; left: 5px" width="350" height="550">
-</canvas>*@
 <div style="overflow:scroll;">
-<img src="@currentImage" id="currentImage" style=" position: absolute; top: 40px; left: 5px" width="700" height="700" />
-<canvas data="" id="canvas" style="border: solid 1px blue; position: absolute; top: 40px; left: 5px" width="700" height="700">
-</canvas>
+    @*
+        Temporary image used to add the current state of the image in the room to new users entering the room.
+        The SetImage function adds it to the canvas. The currentImage is data held in the room
+        instance, and is passed back in the DrawHub each time a user stops drawing.
+        This image is hidden once teh canvas is updated
+    *@
+    <img src="@currentImage" id="currentImage" style=" position: absolute; top: 40px; left: 5px" width="@canvasWidth" height="@canvasHeight" />
+
+    <canvas data="" id="canvas" style="border: solid 1px blue; position: absolute; top: 40px; left: 5px; overflow:hidden;" width="@canvasWidth" height="@canvasHeight">
+    </canvas>
+
 </div>
 
 <div>
@@ -81,9 +72,6 @@
 </div>
 
 <div id="tracker"></div>
-
-
-
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/draw.js"></script>

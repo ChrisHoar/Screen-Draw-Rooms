@@ -14,10 +14,11 @@ let startY = 0;
 let startingImage = new Image();
 let startingImageData = null;
 let zoomRatio = 1;
+let doCanvasScrollInsteadOfDraw = false;
 
-connection.on("ReceiveXYData", function (X, Y, colour, shape) {
-    
-    draw(X, Y, colour, shape);
+connection.on("ReceiveXYData", function (X, Y, colour, shape, lineThickness) {
+
+    draw(X, Y, colour, shape, lineThickness);
 });
 
 connection.on("ReceiveColourData", function (colour) {
@@ -69,8 +70,9 @@ connection.start().then(function () {
 
 
 document.getElementById("colours").addEventListener("change", function (event) {
-    var colour = document.getElementById("colours").options[document.getElementById("colours").selectedIndex].value;
+    //var colour = document.getElementById("colours").options[document.getElementById("colours").selectedIndex].value;
 
+    var colour = document.getElementById("colours").value;
     connection.invoke("ChangeColour", roomName, colour).catch(function (err) {
         return console.error(err.toString());
     });
@@ -191,11 +193,14 @@ function stopDrawing(event) {
 }
 
 function move(event, X, Y) {
+
     //Send draw data coordinates back to the hub, this is then broadcast to all
     //artists in the room (including this one) and is drawn to the canvas
 
     if (engage == true) {
-        var colour = document.getElementById("colours").options[document.getElementById("colours").selectedIndex].value;
+        var colour = document.getElementById("colours").value;
+
+        var lineThickness = document.getElementById("linethickness").value;
 
         var shape = document.getElementById("shapes").options[document.getElementById("shapes").selectedIndex].value;
 
@@ -203,13 +208,14 @@ function move(event, X, Y) {
         X = X - rect.x;
         Y = Y - rect.y;
 
-        connection.invoke("SendXAndYData", roomName, X.toString(), Y.toString(), colour, shape)
+        connection.invoke("SendXAndYData", roomName, X.toString(), Y.toString(), colour, shape, lineThickness.toString())
             .catch(function (err) {
                 return console.error(err.toString());
             });
 
         event.preventDefault();
     }
+    
 }
 
 
@@ -273,13 +279,15 @@ function redo() {
 }
 
 
-function draw(X, Y, colour, shape) {
+
+
+function draw(X, Y, colour, shape, lineThickness) {
 
     //If this is the first time the draw function has been called for this
     //draw event, take a snapshot of the canvas so an undo can happen after
     //the draw has finished
 
-    let lineWidth = 5;
+    let lineWidth = lineThickness;
 
     if (drawHitFirstTime == true) {
         addToUndoStack();
@@ -316,7 +324,7 @@ function draw(X, Y, colour, shape) {
 
 }
 
-function drawFreeLine(X, Y, colour, lineWidth) {
+function drawFreeLine(X, Y, colour, lineWidth, lineThickness) {
 
     //Get the canvas so we can offset the x and y relative to its position
 
@@ -335,6 +343,7 @@ function drawFreeLine(X, Y, colour, lineWidth) {
     }
 
     // set line stroke and line width
+
     ctx.strokeStyle = colour;
     ctx.lineWidth = lineWidth;
 
@@ -344,6 +353,7 @@ function drawFreeLine(X, Y, colour, lineWidth) {
     // draw a red line
 
     ctx.beginPath();
+    ctx.lineCap = 'round';
     ctx.moveTo(previousX, previousY);
     ctx.lineTo(X, Y);
     ctx.stroke();

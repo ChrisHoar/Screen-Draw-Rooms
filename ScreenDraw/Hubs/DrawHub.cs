@@ -68,7 +68,7 @@ namespace ScreenDraw.Hubs
             try
             {
                 //Get the room object
-                var room = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault<IRoom>();
+                var room = sketchRooms.GetRoom(RoomName);
 
                 if (room != null)
                 {
@@ -94,8 +94,8 @@ namespace ScreenDraw.Hubs
         }
 
 
-        public Task SendXAndYData(string RoomName, string X, string Y, string Colour, string Shape)
-            => Clients.Group(RoomName).SendAsync("ReceiveXYData", X, Y, Colour, Shape);
+        public Task SendXAndYData(string RoomName, string X, string Y, string Colour, string Shape, string LineThickness)
+            => Clients.Group(RoomName).SendAsync("ReceiveXYData", X, Y, Colour, Shape, LineThickness);
 
         public Task SendStartXAndYData(string RoomName, string X, string Y)
             => Clients.Group(RoomName).SendAsync("ReceiveStartXAndYData", X, Y);
@@ -112,10 +112,8 @@ namespace ScreenDraw.Hubs
         {
             //Called after a draw completes. It is used when people first join the room so
             //they are presented with the current state of the canvas
-
             IRoom room = sketchRooms.Rooms.Where(r => r.Name == WebUtility.UrlDecode(RoomName)).FirstOrDefault();
             room.CurrentImage = Image;
-
         }
 
         public void AddToUndoStack(string Image, string RoomName)

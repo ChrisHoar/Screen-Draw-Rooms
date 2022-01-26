@@ -30,10 +30,16 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
 - task: AzureRmWebAppDeployment@4
   inputs:
     ConnectionType: 'AzureRM'
-    azureSubscription: 'Azure subscription 1 (677b286a-db44-4d10-a77a-2571e65a2b86)'
+    azureSubscription: 'Azure subscription 1(677b286a-db44-4d10-a77a-2571e65a2b86)'
     appType: 'webAppLinux'
-    WebAppName: 'ScreenDrawCH'
-    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    WebAppName: 'ScreenDrawCHNew'
+    packageForLinux: '$(Build.ArtifactStagingDirectory)/*.zip'
+    RuntimeStack: 'DOTNETCORE|5.0'

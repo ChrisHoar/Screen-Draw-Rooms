@@ -45,7 +45,7 @@ namespace ScreenDraw
 
             // Inject a colour list for the colour drop down
             // For the moment add this as a singleton as its currently never changing
-            services.Add(new ServiceDescriptor(typeof(IList<IColourListItem>), ColourListFactory.GetColourListObject()));
+            //services.Add(new ServiceDescriptor(typeof(IList<IColourListItem>), ColourListFactory.GetColourListObject()));
 
             //Inject a SketchRooms object as a singleton. This will hold all the information about
             //the rooms and the artists inside those rooms, and will persist for as long as there are users,
@@ -72,6 +72,8 @@ namespace ScreenDraw
             }
 
             app.UseHttpsRedirection();
+
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -80,9 +82,11 @@ namespace ScreenDraw
 
             app.UseSession();
 
-
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}");
                 endpoints.MapRazorPages();
                 endpoints.MapBlazorHub();
                 endpoints.MapHub<DrawHub>("/drawHub");

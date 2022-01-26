@@ -10,5 +10,7 @@ namespace ScreenDraw.Classes
         public string CurrentImage { get; set; }
         public LimitedSizeStack<string> UndoStack { get; set; }
         public LimitedSizeStack<string> RedoStack { get; set; }
+        public int CanvasWidth { get; set; }
+        public int CanvasHeight { get; set; }
     }
 }

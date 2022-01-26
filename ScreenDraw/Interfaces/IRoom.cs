@@ -11,5 +11,7 @@ namespace ScreenDraw.Interfaces
         string CurrentImage { get; set; }
         LimitedSizeStack<string> UndoStack { get; set; }
         LimitedSizeStack<string> RedoStack { get; set; }
+        int CanvasWidth { get; set; }
+        int CanvasHeight { get; set; }
     }
 }
