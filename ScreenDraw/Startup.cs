@@ -82,9 +82,11 @@ namespace ScreenDraw
 
             app.UseSession();
 
-
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}");
                 endpoints.MapRazorPages();
                 endpoints.MapBlazorHub();
                 endpoints.MapHub<DrawHub>("/drawHub");
