@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnitTests;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 
 namespace TestProject1
@@ -302,7 +303,118 @@ namespace TestProject1
             //obj.Find("artistName").MarkupMatches("<input id='artistName' value='Test Artist' />", "Updating artist name variable does not update the input field");
         }
 
+        [Fact]
+        public void HomeController_CheckIndex_Will_ReturnAssignableIActionResult()
+        {
+            var controller = new ScreenDraw.Controllers.HomeController();
+
+            var res = controller.Index();
+
+            Assert.IsAssignableFrom<IActionResult>(res);
+
+        }
+
+        [Fact]
+        public void HomeController_ImageData_Will_ReturnValidJson()
+        {
+            var controller = new ScreenDraw.Controllers.HomeController();
+            var testDataObj = new JsonTestData { name = "Chris" };
+            var serString = System.Text.Json.JsonSerializer.Serialize(testDataObj);
+            var controllerRet = controller.ImageData(serString);
+
+            var retObj = System.Text.Json.JsonSerializer.Deserialize<JsonTestData>(controllerRet.Value.ToString()); ;
+
+            Assert.IsAssignableFrom<JsonTestData>(retObj);
+        }
+
+        [Fact]
+        public void LimitedStack_Verify_WhenSpecifiedLimitReached_BottomItemPoppedOffStack()
+        {
+            int size = 5;
+            var lStack = new LimitedSizeStack<string>(size);
+
+            for(int i = 1; i <= 6; i++) //Go to 6 i.e. 1 over limit
+            {
+                lStack.Push($"Item {i}");
+            }
+
+            Assert.Equal("Item 2", lStack.Last.Value);
+
+        }
+
+        [Fact]
+        public void LimitedStack_Verify_WhenBottomItemPoppedOffStack_FirstItemIsValid()
+        {
+            int size = 5;
+            var lStack = new LimitedSizeStack<string>(size);
+
+            for (int i = 1; i <= 6; i++)
+            {
+                lStack.Push($"Item {i}");
+            }
+
+            Assert.Equal("Item 6", lStack.First.Value);
+
+        }
+
+        [Fact]
+        public void LimitedStack_Verify_Pop_RemovesFirstItem()
+        {
+            int size = 5;
+            var lStack = new LimitedSizeStack<string>(size);
+
+            for (int i = 1; i <= 5; i++)
+            {
+                lStack.Push($"Item {i}");
+            }
+
+            lStack.Pop();
+
+            Assert.Equal("Item 4", lStack.First.Value);
+
+        }
+
+        [Fact]
+        public void LimitedStack_Verify_TryPop_ReturnsLastItem()
+        {
+            int size = 5;
+            var lStack = new LimitedSizeStack<string>(size);
+
+            for (int i = 1; i <= 5; i++)
+            {
+                lStack.Push($"Item {i}");
+            }
+
+            string retItem = string.Empty;
+            lStack.TryPop(out retItem);
+
+            Assert.Equal("Item 5", retItem);
+
+        }
+
+        [Fact]
+        public void LimitedStack_Verify_TryPop_RemovesLastItem()
+        {
+            int size = 5;
+            var lStack = new LimitedSizeStack<string>(size);
+
+            for (int i = 1; i <= 5; i++)
+            {
+                lStack.Push($"Item {i}");
+            }
+
+            string retItem = string.Empty;
+            lStack.TryPop(out retItem);
+
+            Assert.DoesNotContain<string>("Item 5", lStack);
+
+        }
+
+    }
+
+    public class JsonTestData
+    {
+        public string name { get; set; }
     }
 
 }
-
