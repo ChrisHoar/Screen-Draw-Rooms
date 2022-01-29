@@ -318,7 +318,7 @@ namespace TestProject1
         public void HomeController_ImageData_Will_ReturnValidJson()
         {
             var controller = new ScreenDraw.Controllers.HomeController();
-            var testDataObj = new JsonTestData { name = "Chris" };
+            var testDataObj = new JsonTestData { name = "Chris", age = 49 };
             var serString = System.Text.Json.JsonSerializer.Serialize(testDataObj);
             var controllerRet = controller.ImageData(serString);
 
@@ -415,6 +415,7 @@ namespace TestProject1
     public class JsonTestData
     {
         public string name { get; set; }
+        public int age { get; set; }
     }
 
 }
