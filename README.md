@@ -9,5 +9,5 @@ On the second device join the newly created room.
 
 When you draw on one device it will be reflected on the second.
 
-
+**If you are behind a firewall you may need to get additional permissions to allow SignalR to communicate.**
 
