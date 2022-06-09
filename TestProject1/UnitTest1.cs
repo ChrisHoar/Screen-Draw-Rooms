@@ -77,7 +77,6 @@ namespace TestProject1
             //Check a room added to the rooms list happens and is equal to what was added
             sr.Rooms = new List<IRoom>();
             sr.Rooms.Add(room);
-            sr = sr;
             
             var roomCheck = sr.GetRoom("Test Room");
             Assert.Equal(room, roomCheck);
