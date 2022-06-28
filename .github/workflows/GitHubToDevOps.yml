@@ -11,8 +11,8 @@ jobs:
     steps:
       - uses: danhellem/github-actions-issue-to-work-item@master
         env:
-          ado_token: "zkfozfd3tsdhx3mjix74yvqll2wifscqm3ggz4fqzvokjy2soneq"
-          github_token: "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"
+          ado_token: "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}"
+          github_token: "${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}"
           ado_organization: "chrisjhoar"
           ado_project: "Screen Draw Rooms"
           ado_wit: "Task"
