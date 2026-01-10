@@ -55,7 +55,7 @@ namespace TestProject1
             ctx.Services.Add(new ServiceDescriptor(typeof(ILogger<RoomList>), logger));
 
             //Initialise the RoomList and pass paramaters values to it
-            var cut = ctx.RenderComponent<RoomList>(parameters => parameters
+            var cut = ctx.Render<RoomList>(parameters => parameters
                 .Add(p => p.artistName, ArtistName)
                 .Add(p => p.newRoomName, RoomName)
                 .Add(p => p.error, string.Empty)
