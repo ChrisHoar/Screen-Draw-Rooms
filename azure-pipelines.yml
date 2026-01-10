@@ -2,11 +2,10 @@ trigger:
 - master
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'windows-latest' 
 
 variables:
   solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
 steps:
@@ -15,34 +14,33 @@ steps:
   inputs:
     packageType: 'sdk'
     version: '10.0.x'
-    installationPath: '$(Agent.ToolsDirectory)/dotnet'
-
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Build Project'
+  displayName: 'Restore'
+  inputs:
+    command: 'restore'
+    projects: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build'
   inputs:
     command: 'build'
     projects: '$(solution)'
-    arguments: '--configuration $(buildConfiguration)'
+    arguments: '--configuration $(buildConfiguration) --no-restore'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Run Tests'
+  displayName: 'Test'
   inputs:
     command: 'test'
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration)'
+    arguments: '--configuration $(buildConfiguration) --no-build'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Publish Web App'
+  displayName: 'Publish'
   inputs:
     command: 'publish'
     publishWebProjects: true
-    arguments: '--configuration $(buildConfiguration) --output $(build.artifactStagingDirectory)'
+    arguments: '--configuration $(buildConfiguration) --output $(build.artifactStagingDirectory) --no-build'
     zipAfterPublish: true
 
 - task: PublishBuildArtifacts@1
@@ -58,4 +56,4 @@ steps:
     appType: 'webAppLinux'
     WebAppName: 'ScreenDrawCHNew'
     packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
-    RuntimeStack: 'DOTNETCORE|10.0'
+    RuntimeStack: 'DOTNETCORE|10.0' 
